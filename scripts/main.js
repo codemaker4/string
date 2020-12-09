@@ -27,7 +27,7 @@ function mouseDraw(ctx) {
 var stuffToDraw = [
   () => {ctx.clearRect(0,0,canvasW, canvasH)},
   () => {mouseDraw(ctx)},
-  () => {elastic.multiTick(1/60, 10)},
+  () => {elastic.multiTick(1/60, 50)},
   () => {elastic.draw(ctx)},
 ];
 
