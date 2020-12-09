@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>js empty canvas</title>
+  </head>
+  <body style="margin:0;overflow:hidden;">
+    <canvas id="canvas" width="150" height="150" style="position: absolute;"></canvas>
+    <div style="position: absolute;right: 0%;">
+      <button onclick="elastic.timeSpeed = elastic.timeSpeed*2;">sneller</button>
+      <button onclick="elastic.timeSpeed = elastic.timeSpeed*0.5;">langzamer</button>
+      <button onclick="elastic.paused = !elastic.paused;">pauzeer</button>
+      <button onclick="promptSinePath()">verzet elastiek</button>
+      <button onclick="resetElastic()">reset elastiek</button>
+    </div>
+    <script src="scripts/util.js" charset="utf-8"></script>
+    <script src="scripts/elastic.js" charset="utf-8"></script>
+    <script src="scripts/main.js" charset="utf-8"></script>
+    <script src="scripts/events.js" charset="utf-8"></script>
+  </body>
+</html>

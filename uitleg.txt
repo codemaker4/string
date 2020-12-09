@@ -1,0 +1,41 @@
+Hier is de uitleg
+
+Main.js is waar alle functies worden aangeroepen,
+events.js heeft een paar handige functies voor het detecteren van de muis
+util.js is voor handige functies in het algameen, maar heeft alleen een functie voor afstand tussen twee punten
+elastic.js defineert alle functies voor de elastiek zelf, dus daar zit (onder andere) alle natuurkunde.
+
+De elastiek bestaat uit 100 punten die allemaal met een soort veer met elkaar zijn verbonden om een ketting te vormen.
+Elastic.nodes heeft 4 lijsten: twee voor de positie van alle punten (x en y) en twee voor de snelheden van alle punten (delta x en delta y)
+Ik gebruik de speciale Float64Arrays voor een hogere snelheid van het programma.
+Dit betekent wel dat de eigenschappen van punten een rare naam krijgen:
+
+elastic.nodes.<eigenschapNaam>[<index>]
+
+voorbeeld: 
+de delta Y voor node 25
+
+elastic.nodes.dy[25]
+
+en ten slotte de eenheden:
+alle eenheden zijn 'normaal', behalve de eenheid voor afstand: die is in pixels. De meeste schermen hebben nu een breedte in de duizenden pixels
+
+nu is het tijd voor wat de code betekent:
+
+De calculate functie (elastic.js regel 50) wordt zo'n 60000 keer per seconde uitgevoerd. De tijd parameter krijgt dan ook altijd 1/60000 seconden mee.
+Eerst is er een loop die door alle nodes (behalve de laatste) heen loopt.
+In die loop berekent node i de kracht tussen zichzelf en de volgende node in de elastiek (i+1) (één node naar rechts) (de laatste node wordt overgeslagen omdat die geen node rechts van zichzelf heeft).
+Tussen alle nodes is een soort virtuele veer. Deze heeft een rustlengte van 0, maar kan langer zijn. Deze is gedefineerd op elastic.nodeGoalDist.
+Op regel 52 berekent de code strechDist. Dit is hoeveel de veer tussen de node i en de daaropvolgende node is uitgerekt. 0 betekent een ontspannen veer, >0 betekent een uitgerekte veer, en <0 betekent een veer die wordt samengedrukt. Omdat dit een elastiek is, en geen touw, zijn er geen spanningskrachten wanneer de lengte van die veer/elastiek korter is dan de neutrale lengte. Regel 53 controleert of er wel spanning is voordat de spanning wordt omgezet in beweging.
+op regel 54 wordt de magnitude van de acceleratie berekent. strechDist * elastic.strength is de formule voor veerkracht (uitgerekteAfstand * veerSterkte). Dit is een kracht, dus im de acceleratie te krijgen delelt de code dit door elastic.nodeMass (de massa van een node). Nu heeft de code de acceleratie in m/s^2 berekent, maar er wordt de acceleratie over een bepaalde tijdstap berekent die niet 1 seconde is, dus de code vermenigvildigt dit met de grootte van de tijdstap (time). Ten slotte deelt de code dece acceleratie door twee, om de acceleratie per node te krijgen.
+op regel 55 berekent de code direction. Dit is de richting van de vector vanaf node i naar de volgende node. Dit is de rechting van de kracht die op node i speelt, en de omgekeerde richting van de kracht die op node i+1 speelt.
+regel 56 en 57 tellen de acceleratie op bij de snelhied van node i. Om de acceleratie in x en y ipv magnitude en richting te krijgen wordt een sinus en cosinus gebruikt.
+regel 58 en 59 wordt het zelfde gedaan, maardan voor de volgende node. Omdat die een omgekeerde kracht krijgt wordt de acceleratie negatief gemaakt.
+
+Nu zijn alle nodes geaccelereert volgens de veerkrachten. Ze zijn expres nog niet bewogen, omdat als dit midden in de berekening wordt gedaan, krijg je rare effecten, onder andere dat de snelhied van geluid anders zou zijn in verschillende richtingen.
+
+Het daadwerkelijk verplaatsen van de nodes wordt gedaan in de move functie (elastic.js regel 132). Deze is simpel: neem de snelheid, vermenigvuldig dit met de tijdsstaplengte en tel dit op bij de positie.
+
+In fullTick (elastic.js regel 40) worden al deze functies in de goede volgorde aangeroepen.
+elastic.doAnchors(); regelt dat de nodes aan het begin en eind, ofwel de 'ankers', op de zelfde plek blijven.
+elastic.avoidMouse(100); regelt dat alle nodes van de muis weg woden geduwd als ze dichterbij dan 100 pixels zijn. Dit gebeurt alleen als je klikt.
